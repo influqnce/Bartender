@@ -3,10 +3,10 @@ const { Vec3 } = require('vec3');
 
 const bot = mineflayer.createBot({
   host: 'Fremds-KQcg.aternos.me',
-  port: 24158,
+  port: 25565,
   username: 'bartender_bill',
   auth: 'offline',
-  version: false,
+  version: '1.20.4',
 });
 
 const DRINK_TOKEN_ITEM = 'diamond';
@@ -22,14 +22,13 @@ const phrases = [
   "💎 Diamonds for drinks, folks!"
 ];
 
-// Only start the chat loop after the bot has spawned
+setInterval(() => {
+  const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+  bot.chat(phrase);
+}, 10 * 60 * 1000); // every 10 minutes
+
 bot.once('spawn', () => {
   bot.chat('🍷 Bartender is now active!');
-
-  setInterval(() => {
-    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-    bot.chat(phrase);
-  }, 10 * 60 * 1000); // every 10 minutes
 });
 
 // === Diamond for Potion Trade ===
