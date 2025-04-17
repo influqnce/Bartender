@@ -3,7 +3,7 @@ const { Vec3 } = require('vec3');
 
 const bot = mineflayer.createBot({
   host: 'Fremds-KQcg.aternos.me',
-  port: 25565,
+  port: 24158,
   username: 'bartender_bill',
   auth: 'offline',
   version: '1.20.4',
