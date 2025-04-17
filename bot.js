@@ -6,7 +6,7 @@ const bot = mineflayer.createBot({
   port: 24158,
   username: 'bartender_bill',
   auth: 'offline',
-  version: '1.20.4',
+  version: false,
 });
 
 const DRINK_TOKEN_ITEM = 'diamond';
