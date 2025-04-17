@@ -22,13 +22,14 @@ const phrases = [
   "💎 Diamonds for drinks, folks!"
 ];
 
-setInterval(() => {
-  const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-  bot.chat(phrase);
-}, 10 * 60 * 1000); // every 10 minutes
-
+// Only start the chat loop after the bot has spawned
 bot.once('spawn', () => {
   bot.chat('🍷 Bartender is now active!');
+
+  setInterval(() => {
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    bot.chat(phrase);
+  }, 10 * 60 * 1000); // every 10 minutes
 });
 
 // === Diamond for Potion Trade ===
