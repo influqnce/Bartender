@@ -15,7 +15,7 @@ const POTION_ITEM_NAME = 'potion';
 let musicPlaying = false;
 
 const randomMessages = [
-  "🍷 Come to the Wine Shop! By the Jungle Shop and the Bar! Only 1 Diamond!",
+  "🍷Come to the Wine Shop! Exclusive Wine for only 1 Diamond! Brought to your by the Jungle Shop and The bar."
 ];
 
 // === Bot Startup ===
