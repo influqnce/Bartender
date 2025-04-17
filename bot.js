@@ -3,7 +3,7 @@ const { Vec3 } = require('vec3');
 
 const bot = mineflayer.createBot({
   host: 'Fremds-KQcg.aternos.me',
-  port: 24158,
+  port: 25565,
   username: 'bartender_bill',
   auth: 'offline',
   version: '1.20.4',
@@ -49,7 +49,7 @@ bot.on('playerCollect', async (collector, collected) => {
         bot.chat('🔍 Hopper found. Tossing diamond...');
 
         try {
-          await bot.lookAt(hopper.position.offset(0.5, 0.2, 0.5)); // aim lower, just above hopper
+          await bot.lookAt(hopper.position.offset(0.5, 0.2, 0.5)); // aim low to prevent tossing upward
           await bot.equip(token, 'hand');
           await bot.tossStack(token);
           bot.chat('/give @p potion[potion_contents={custom_color:13061821,custom_effects:[{id:poison,duration:50,amplifier:1},{id:nausea,duration:600,amplifier:200}]},custom_name:[{"text":"Wine","italic":false}]]');
@@ -83,6 +83,9 @@ bot.on('playerCollect', async (collector, collected) => {
 bot.on('chat', async (username, message) => {
   if (username === bot.username) return;
 
+  const args = message.toLowerCase().split(' ');
+
+  // === Stop Music ===
   if (message.toLowerCase() === 'stop music') {
     const jukebox = bot.findBlock({
       matching: block => block.name === 'jukebox',
@@ -106,15 +109,26 @@ bot.on('chat', async (username, message) => {
     return;
   }
 
-  if (message.toLowerCase().startsWith('play music disc')) {
-    const discName = message.slice('play music disc '.length).trim();
-    const formattedDiscName = discName.replace(/ /g, '_');
-    const itemName = `music_disc_${formattedDiscName}`;
-    const discItem = bot.inventory.items().find(item => item.name === itemName);
+  // === Play Music ===
+  if (args[0] === 'play') {
+    let discItem;
 
-    if (!discItem) {
-      bot.chat(`❌ I don't have "${discName}" in my inventory.`);
-      return;
+    if (args[1] === 'random') {
+      const allDiscs = bot.inventory.items().filter(item => item.name.startsWith('music_disc_'));
+      if (allDiscs.length === 0) {
+        bot.chat('❌ I have no music discs to play.');
+        return;
+      }
+      discItem = allDiscs[Math.floor(Math.random() * allDiscs.length)];
+    } else {
+      const discName = args.slice(1).join('_');
+      const itemName = `music_disc_${discName}`;
+      discItem = bot.inventory.items().find(item => item.name === itemName);
+
+      if (!discItem) {
+        bot.chat(`❌ I don't have "${args.slice(1).join(' ')}" in my inventory.`);
+        return;
+      }
     }
 
     const jukebox = bot.findBlock({
@@ -139,9 +153,10 @@ bot.on('chat', async (username, message) => {
       await bot.activateBlock(jukebox); // Insert new disc
       musicPlaying = true;
 
-      bot.chat(`🎶 Now playing: ${discName}`);
+      const niceName = discItem.name.replace('music_disc_', '').replace(/_/g, ' ');
+      bot.chat(`🎶 Now playing: ${niceName}`);
 
-      // Dance animation
+      // Dance wiggle
       for (let i = 0; i < 2; i++) {
         await bot.look(bot.entity.yaw + Math.PI / 2, 0);
         await bot.waitForTicks(10);
