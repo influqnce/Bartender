@@ -2,11 +2,11 @@ const mineflayer = require('mineflayer');
 const { Vec3 } = require('vec3');
 
 const bot = mineflayer.createBot({
-  host: 'fafasachu.aternos.me',
-  port: 25565,
+  host: 'Fremds-KQcg.aternos.me',
+  port: 24158,
   username: 'bartender_bill',
   auth: 'offline',
-  version: '1.20.4',
+  version: 'false',
 });
 
 const DRINK_TOKEN_ITEM = 'diamond';
