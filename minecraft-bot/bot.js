@@ -2,7 +2,7 @@ const mineflayer = require('mineflayer');
 const { Vec3 } = require('vec3');
 
 const bot = mineflayer.createBot({
-  host: 'Fremds-KQcg.aternos.me',
+  host: 'fafasachu.aternos.me',
   port: 25565,
   username: 'bartender_bill',
   auth: 'offline',
@@ -14,17 +14,28 @@ const DRINK_TOKEN_ITEM = 'diamond';
 const POTION_ITEM_NAME = 'potion';
 let musicPlaying = false;
 
-const randomMessages = [
-  "🍷Come to the Wine Shop! Exclusive Wine for only 1 Diamond! Brought to your by the Jungle Shop and The bar."
+// === Random bartender phrases ===
+const bartenderQuotes = [
+  "🍷 Fancy a refill?",
+  "✨ This wine's aged 2000 ticks!",
+  "💬 Tip your bartender, folks!",
+  "🧪 I mix potions, not emotions.",
+  "👀 Anyone seen the jukebox key?",
+  "🎵 Got a music disc? I’ve got moves.",
+  "💎 Diamonds are a drink’s best friend.",
+  "🍶 Wine not?",
+  "🎭 I perform better after a redstone reboot.",
+  "🧃 Ever tried fermented spider eye on the rocks?"
 ];
 
-// === Bot Startup ===
+// Say something every 10 minutes
+setInterval(() => {
+  const quote = bartenderQuotes[Math.floor(Math.random() * bartenderQuotes.length)];
+  bot.chat(quote);
+}, 10 * 60 * 1000); // 10 minutes
+
 bot.once('spawn', () => {
   bot.chat('🍷 Bartender is now active!');
-  setInterval(() => {
-    const msg = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-    bot.chat(msg);
-  }, 10 * 60 * 1000); // Every 10 minutes
 });
 
 // === Diamond for potion trade ===
@@ -34,10 +45,7 @@ bot.on('playerCollect', async (collector, collected) => {
   setTimeout(async () => {
     const token = bot.inventory.items().find((item) => item.name === DRINK_TOKEN_ITEM);
     if (token) {
-      const playerEntity = bot.players[collector.username]?.entity;
-      if (playerEntity) {
-        await bot.lookAt(playerEntity.position.offset(0, playerEntity.height, 0));
-      }
+      bot.chat(`✅ Token detected: ${DRINK_TOKEN_NAME}`);
 
       const hopper = bot.findBlock({
         matching: (block) => block.name === 'hopper',
@@ -45,36 +53,23 @@ bot.on('playerCollect', async (collector, collected) => {
       });
 
       if (hopper) {
-        bot.chat('Heres Your Drink! Enjoy!');
+        bot.chat('🔍 Hopper found. Tossing diamond...');
 
         try {
+          await bot.lookAt(hopper.position.offset(0.5, 0.5, 0.5));
           await bot.equip(token, 'hand');
           await bot.tossStack(token);
-          bot.chat('/give @p potion[potion_contents={custom_color:13061821,custom_effects:[{id:poison,duration:50,amplifier:1},{id:nausea,duration:600,amplifier:200}]},custom_name=[{"text":"Wine","italic":false}]]');
         } catch (err) {
           console.log('❌ Toss error:', err);
           bot.chat('❌ Could not toss diamond into hopper.');
         }
 
         await bot.look(bot.entity.yaw + Math.PI, 0);
-      } else {
-        bot.chat('❌ No hopper found nearby.');
       }
 
-      const potionItem = bot.inventory.items().find((item) => item.name === POTION_ITEM_NAME);
-      if (potionItem) {
-        bot.tossStack(potionItem, (err) => {
-          if (err) {
-            bot.chat('❌ Failed to toss potion.');
-          } else {
-            bot.chat('🍶 Here is your drink!');
-          }
-        });
-      } else {
-        bot.chat('❌ No potion in inventory.');
-      }
-    } else {
-      bot.chat("");
+      // Give custom potion via command
+      bot.chat('/give @p potion[potion_contents={custom_color:13061821,custom_effects:[{id:poison,duration:50,amplifier:1},{id:nausea,duration:600,amplifier:200}]},custom_name=[{"text":"Wine","italic":false}]]');
+
     }
   }, 1000);
 });
@@ -150,6 +145,7 @@ bot.on('chat', async (username, message) => {
       }
 
       await bot.look(bot.entity.yaw + Math.PI, 0); // Final 180°
+
     } catch (err) {
       console.log('❌ Error playing disc:', err);
       bot.chat('❌ Could not play the music disc.');
